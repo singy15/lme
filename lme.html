@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <style>
+    html {
+      height:100%;
+      width:100%;
+    }
+    body {
+      height:100%;
+      width:100%;
+    }
+    .markdown-body {
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 45px;
+    }
+    .default-btn {
+      background: #EEE;
+      border-top: 1px solid #DDD;
+      border-left: 1px solid #DDD;
+      border-right: 1px solid #BBB;
+      border-bottom: 1px solid #BBB;
+      color:#111;
+      padding: 10px 0;
+    }
+    .ui {
+      position:fixed;
+      left:0px;
+      top:0px;
+      background-color:#F0F0F0;
+      width:100px;
+      height:100%;
+    }
+    .btn {
+      cursor : pointer;
+      font-size : small;
+      background-color : #888;
+      color : #FFF;
+      margin-bottom : 1px;
+      padding-left : 5px;
+    }
+    .btn a {
+      font-size : small;
+      color : #FFF;
+      text-decoration : none;
+    }
+    .logo {
+      font-size : 40px;
+      text-align : center;
+    }
+  </style>
+  <title>lme</title>
+  <link rel="stylesheet" type="text/css" href="./lib/github-markdown.css">
+  <script src="./lib/jquery-3.0.0.min.js"></script>
+  <script src="./lib/marked.min.js"></script>
+  <script src="./lib/ace/ace.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/github");
+      editor.session.setMode("ace/mode/markdown");
+
+      editor.getSession().on('change', function(e) {
+        $("#content").html(marked(editor.getValue()));
+        setBlobUrl("save", editor.getValue());
+      });
+
+      $("#selfile").change(function(evt){
+        var file = evt.target.files;
+        var reader = new FileReader();
+        reader.readAsText(file[0]);
+        
+        reader.onload = function(ev){
+          var str = reader.result;
+          $("#content").html(marked(str));
+          editor.setValue(str);
+        }
+      });
+
+      var toggle = true;
+      $("#showhide").click(function() {
+        toggle = !toggle;
+        if(toggle) {
+          $("#content").css("width", "50%");
+          $("#editor").css("width", "40%");
+        } else {
+          $("#content").css("width", "100%");
+          $("#editor").css("width", "0%");
+        }
+      });
+    });
+
+    function setBlobUrl(id, content) {
+     // Create blob.
+        var blob = new Blob([ content ], { "type" : "application/x-msdownload" });
+     
+     // Set href.
+        window.URL = window.URL || window.webkitURL;
+        $("#" + id).attr("href", window.URL.createObjectURL(blob));
+        $("#" + id).attr("download", "markdown.md");
+    }
+  </script>
+
+
+</head>
+<body>
+  <div id="ui" class="ui"> 
+    <div class="logo">lme</div>
+      <label style="margin:0px;padding:0px">
+        <div href="#" class="btn">LOAD</div>
+      <input type="file" id="selfile" style="display:none"/>
+    </label>
+    <div class="btn"><a href="#" id="save">DOWNLOAD</a></div>
+    <div id="showhide" class="btn">SHOW/HIDE</div>
+  </div>
+  <div style="height:100%">
+    <div id="content" class="markdown-body" style="width:50%; height:100%;margin-left:100px;"></div>
+  </div>
+  <div id="editor" style="width:40%;height:99%; position:fixed; top:0px; right:5px;"></div>
+</body>
+</html>
