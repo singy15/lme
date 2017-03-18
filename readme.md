@@ -25,7 +25,7 @@ lme is light-weight markdown editor built with HTML5 + JavaScript.
     
 ## License
 
-Copyright (c) [2017] [singy]
+Copyright (c) 2017, singy
 
 This software is released under the MIT License.
 http://opensource.org/licenses/mit-license.php
