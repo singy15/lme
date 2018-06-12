@@ -53,17 +53,25 @@
       font-size : 40px;
       text-align : center;
     }
+
+    select {
+      width : 100px;
+      color : #FFF;
+      background-color : #888;
+      font-size : small;
+    }
   </style>
   <title>lme</title>
   <link rel="stylesheet" type="text/css" href="./lib/github-markdown.css">
   <script src="./lib/jquery-3.0.0.min.js"></script>
   <script src="./lib/marked.min.js"></script>
-  <script src="./lib/ace/ace.js"></script>
+  <script src="./lib/ace/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
   <script>
     $(document).ready(function() {
       var editor = ace.edit("editor");
       editor.setTheme("ace/theme/github");
+      // editor.setTheme("ace/theme/twilight");
       editor.session.setMode("ace/mode/markdown");
 
       editor.getSession().on('change', function(e) {
@@ -94,6 +102,17 @@
           $("#editor").css("width", "0%");
         }
       });
+
+      $("#cmbInputMode").change(function(e) {
+        var val = $("#cmbInputMode").val();
+        if(val === "vim") {
+          editor.setKeyboardHandler("ace/keyboard/vim");
+        } else if(val === "emacs") {
+          editor.setKeyboardHandler("ace/keyboard/emacs");
+        } else {
+          editor.setKeyboardHandler(null);
+        }
+      });
     });
 
     function setBlobUrl(id, content) {
@@ -118,6 +137,11 @@
     </label>
     <div class="btn"><a href="#" id="save">DOWNLOAD</a></div>
     <div id="showhide" class="btn">SHOW/HIDE</div>
+    <select id="cmbInputMode" style="width:100px">
+      <option value="normal">Normal</option>
+      <option value="vim">Vim</option>
+      <option value="emacs">Emacs</option>
+    </select>
   </div>
   <div style="height:100%">
     <div id="content" class="markdown-body" style="width:50%; height:100%;margin-left:100px;"></div>
