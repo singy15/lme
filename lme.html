@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -66,67 +65,6 @@
   <script src="./lib/jquery-3.0.0.min.js"></script>
   <script src="./lib/marked.min.js"></script>
   <script src="./lib/ace/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-
-  <script>
-    $(document).ready(function() {
-      var editor = ace.edit("editor");
-      editor.setTheme("ace/theme/github");
-      // editor.setTheme("ace/theme/twilight");
-      editor.session.setMode("ace/mode/markdown");
-
-      editor.getSession().on('change', function(e) {
-        $("#content").html(marked(editor.getValue()));
-        setBlobUrl("save", editor.getValue());
-      });
-
-      $("#selfile").change(function(evt){
-        var file = evt.target.files;
-        var reader = new FileReader();
-        reader.readAsText(file[0]);
-        
-        reader.onload = function(ev){
-          var str = reader.result;
-          $("#content").html(marked(str));
-          editor.setValue(str);
-        }
-      });
-
-      var toggle = true;
-      $("#showhide").click(function() {
-        toggle = !toggle;
-        if(toggle) {
-          $("#content").css("width", "50%");
-          $("#editor").css("width", "40%");
-        } else {
-          $("#content").css("width", "100%");
-          $("#editor").css("width", "0%");
-        }
-      });
-
-      $("#cmbInputMode").change(function(e) {
-        var val = $("#cmbInputMode").val();
-        if(val === "vim") {
-          editor.setKeyboardHandler("ace/keyboard/vim");
-        } else if(val === "emacs") {
-          editor.setKeyboardHandler("ace/keyboard/emacs");
-        } else {
-          editor.setKeyboardHandler(null);
-        }
-      });
-    });
-
-    function setBlobUrl(id, content) {
-     // Create blob.
-        var blob = new Blob([ content ], { "type" : "application/x-msdownload" });
-     
-     // Set href.
-        window.URL = window.URL || window.webkitURL;
-        $("#" + id).attr("href", window.URL.createObjectURL(blob));
-        $("#" + id).attr("download", "markdown.md");
-    }
-  </script>
-
-
 </head>
 <body>
   <div id="ui" class="ui"> 
@@ -143,9 +81,79 @@
       <option value="emacs">Emacs</option>
     </select>
   </div>
-  <div style="height:100%">
+  <div style="height:100%" id="dropzone">
     <div id="content" class="markdown-body" style="width:50%; height:100%;margin-left:100px;"></div>
   </div>
   <div id="editor" style="width:40%;height:99%; position:fixed; top:0px; right:5px;"></div>
 </body>
+<script>
+var dropzone = document.getElementById("dropzone");
+var editor = ace.edit("editor");
+var showPreview = true;
+
+editor.setTheme("ace/theme/github");
+editor.session.setMode("ace/mode/markdown");
+editor.getSession().on('change', function(e) {
+	$("#content").html(marked(editor.getValue()));
+	setBlobUrl("save", editor.getValue());
+});
+
+$("#selfile").change(function(evt){
+	readFile(evt.target.files[0]);
+});
+
+$("#showhide").click(function() {
+	showPreview = !showPreview;
+	if(showPreview) {
+		$("#content").css("width", "50%");
+		$("#editor").css("width", "40%");
+	} else {
+		$("#content").css("width", "100%");
+		$("#editor").css("width", "0%");
+	}
+});
+
+$("#cmbInputMode").change(function(e) {
+	var val = $("#cmbInputMode").val();
+	if(val === "vim") {
+		editor.setKeyboardHandler("ace/keyboard/vim");
+	} else if(val === "emacs") {
+		editor.setKeyboardHandler("ace/keyboard/emacs");
+	} else {
+		editor.setKeyboardHandler(null);
+	}
+});
+
+dropzone.addEventListener('dragenter', function (e) {
+	e.preventDefault();
+});
+
+dropzone.addEventListener('dragover', function (e) {
+	e.preventDefault();
+});
+
+dropzone.addEventListener('drop', function (e) {
+	readFile(e.dataTransfer.files[0]);
+	e.preventDefault();
+});	
+
+// Create BLOB and set download link.
+function setBlobUrl(id, content) {
+	var blob = new Blob([ content ], { "type" : "application/x-msdownload" });
+	window.URL = window.URL || window.webkitURL;
+	$("#" + id).attr("href", window.URL.createObjectURL(blob));
+	$("#" + id).attr("download", "markdown.md");
+}
+
+// Read file as text and set to editor.
+function readFile(file) {
+	var reader = new FileReader();
+	reader.onload = function(ev){
+		var str = reader.result;
+		$("#content").html(marked(str));
+		editor.setValue(str);
+	}
+	reader.readAsText(file);
+}
+</script>
 </html>
